@@ -15,7 +15,7 @@ public struct BottomSheet<Content>: View where Content: View {
     let openLocation: OpenLocation
     let content: Content
     
-    init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, @ViewBuilder content: () -> Content) {
+    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, @ViewBuilder content: () -> Content) {
         self._isOpen = isOpen
         self.openLocation = openLocation
         self.content = content()
