@@ -7,7 +7,7 @@
 import SwiftUI
 
 public struct BottomSheet<Content>: View where Content: View {
-    @GestureState private var dragTranslation: CGFloat = 0
+    @GestureState private var dragTranslation = CGFloat.zero
     //важное знание: если проперть передана через биндинг, тогда ее значение меняется только во view в которой она использется не пересоздается (не зовется инициалайзер), но перересовывается (redraw)
     @Binding private var isOpen: Bool
     @State private var offset = CGFloat.zero

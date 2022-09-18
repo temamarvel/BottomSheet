@@ -6,17 +6,30 @@
 
 import SwiftUI
 
-struct DragCapsule: View {
-    var body: some View {
+public struct DragCapsule: View {
+    let width: CGFloat
+    let height: CGFloat
+    
+    init(width: CGFloat = 50, height: CGFloat = 8) {
+        self.width = width
+        self.height = height
+    }
+    
+    public var body: some View {
         Capsule()
             .fill(Color(.tertiarySystemFill))
-            .frame(width: 50, height: 8)
+            .frame(width: width, height: height)
             .padding()
     }
 }
 
 struct DragCapsule_Previews: PreviewProvider {
     static var previews: some View {
-        DragCapsule()
+        VStack(spacing: 20){
+            DragCapsule()
+            DragCapsule(width: 100, height: 10)
+            DragCapsule(width: 10, height: 100)
+            DragCapsule(width: 100, height: 100)
+        }
     }
 }
