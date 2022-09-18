@@ -8,7 +8,6 @@ import SwiftUI
 
 public struct BottomSheet<Content>: View where Content: View {
     @GestureState private var dragTranslation = CGFloat.zero
-    //важное знание: если проперть передана через биндинг, тогда ее значение меняется только во view в которой она использется не пересоздается (не зовется инициалайзер), но перересовывается (redraw)
     @Binding private var isOpen: Bool
     @State private var offset = CGFloat.zero
     
@@ -49,9 +48,6 @@ public struct BottomSheet<Content>: View where Content: View {
             )
             .animation(.spring(), value: isOpen)
             .animation(.spring(), value: dragTranslation)
-            //бекграунд полностью перехватывает тапы
-            //так можно делать только если не нужна интерактивность с пользоавтелем
-            //.background(.ultraThinMaterial).opacity(0.2)
         }.edgesIgnoringSafeArea(.all)
     }
 }
