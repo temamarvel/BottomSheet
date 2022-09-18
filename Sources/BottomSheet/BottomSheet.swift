@@ -37,8 +37,9 @@ public struct BottomSheet<Content>: View where Content: View {
                    height: geometry.size.height * 2,
                    alignment: .top)
             
-            .background(Color(.secondarySystemBackground))
+            .background(Color(.tertiarySystemBackground))
             .cornerRadius(20)
+            .shadow(color: Color(.systemGray4), radius: 4)
             .offset(y: isOpen ? SnappingOffset.getOpenOffset(openLocation) : UIScreen.main.bounds.height)
             .offset(y: dragTranslation)
             .offset(y: offset)
