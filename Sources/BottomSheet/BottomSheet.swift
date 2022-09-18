@@ -21,7 +21,7 @@ public struct BottomSheet<Content>: View where Content: View {
     }
     
     public var body: some View {
-        GeometryReader{ _ in
+        GeometryReader{ geometry in
             VStack(){
                 DragCapsule()
                 self.content
@@ -33,12 +33,12 @@ public struct BottomSheet<Content>: View where Content: View {
                     }
                 }
             }
-            .frame(width: UIScreen.main.bounds.width,
-                   height: UIScreen.main.bounds.height * 2,
+            .frame(width: geometry.size.width,
+                   height: geometry.size.height * 2,
                    alignment: .top)
             
             .background(Color(.secondarySystemBackground))
-            .cornerRadius(40)
+            .cornerRadius(20)
             .offset(y: isOpen ? SnappingOffset.getOpenOffset(openLocation) : UIScreen.main.bounds.height)
             .offset(y: dragTranslation)
             .offset(y: offset)
@@ -54,14 +54,17 @@ public struct BottomSheet<Content>: View where Content: View {
 
 struct BottomSheet_Previews: PreviewProvider {
     static var previews: some View {
-        BottomSheet(isOpen: .constant(true), openLocation: .middle){
-            VStack{
-                Text("Test text 123")
-                Text("Hello world")
-                Spacer()
+        ZStack{
+            Rectangle().frame(width: 100, height: 100)
+            BottomSheet(isOpen: .constant(true), openLocation: .middle){
+                VStack{
+                    Text("Test text 123")
+                    Text("Hello world")
+                    Spacer()
+                }
+                .frame(width: 200, height: 400)
+                .background(.red)
             }
-            .frame(width: 200, height: 400)
-            .background(.red)
         }
     }
 }
