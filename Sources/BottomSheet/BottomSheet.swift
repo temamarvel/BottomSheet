@@ -45,7 +45,7 @@ public struct BottomSheet<Content>: View where Content: View {
             .offset(y: offset)
             .gesture(DragGesture()
                 .updating($dragTranslation){ value, gestureState, transaction in gestureState = value.translation.height }
-                .onEnded{ value in offset = calculateOffset(value) }
+                .onEnded{ value in offset = SnappingOffset.calculateOffset(openLocation: openLocation, offset: offset, drarGestureValue: value) }
             )
             .animation(.spring(), value: isOpen)
             .animation(.spring(), value: dragTranslation)
@@ -53,18 +53,6 @@ public struct BottomSheet<Content>: View where Content: View {
             //так можно делать только если не нужна интерактивность с пользоавтелем
             //.background(.ultraThinMaterial).opacity(0.2)
         }.edgesIgnoringSafeArea(.all)
-    }
-    
-    private func calculateOffset(_ value: DragGesture.Value) -> CGFloat{
-        let currentOffset = SnappingOffset.getOpenOffset(openLocation) + offset + value.translation.height
-        
-        if currentOffset < SnappingOffset.topMiddleDelta {
-            return SnappingOffset.top - SnappingOffset.getOpenOffset(openLocation)
-        }
-        if currentOffset > SnappingOffset.middleBottomDelta {
-            return SnappingOffset.bottom - SnappingOffset.getOpenOffset(openLocation)
-        }
-        return SnappingOffset.middle - SnappingOffset.getOpenOffset(openLocation)
     }
 }
 
