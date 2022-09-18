@@ -1,4 +1,5 @@
 import XCTest
+import SwiftUI
 @testable import BottomSheet
 
 final class BottomSheetTests: XCTestCase {
@@ -6,6 +7,6 @@ final class BottomSheetTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(BottomSheet().text, "Hello, World!")
+        XCTAssertEqual(BottomSheet(isOpen: .constant(true)){ Text("Test") }.openLocation, .middle)
     }
 }
