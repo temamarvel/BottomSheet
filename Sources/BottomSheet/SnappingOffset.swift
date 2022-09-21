@@ -26,8 +26,8 @@ final class SnappingOffset {
         }
     }
     
-    static func calculateOffset(openLocation: OpenLocation, offset: CGFloat, drarGestureValue value: DragGesture.Value) -> CGFloat{
-        let currentOffset = SnappingOffset.getOpenOffset(openLocation) + offset + value.translation.height
+    static func calculateDragOffset(openLocation: OpenLocation, dragOffset: CGFloat, dragTranslation: CGFloat) -> CGFloat{
+        let currentOffset = SnappingOffset.getOpenOffset(openLocation) + dragOffset + dragTranslation
         
         if currentOffset < SnappingOffset.topMiddleDelta {
             return SnappingOffset.top - SnappingOffset.getOpenOffset(openLocation)

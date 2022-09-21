@@ -9,7 +9,9 @@ import SwiftUI
 public struct BottomSheet<Content>: View where Content: View {
     @GestureState private var dragTranslation = CGFloat.zero
     @Binding private var isOpen: Bool
-    @State private var offset = CGFloat.zero
+    @State private var dragOffset = CGFloat.zero
+    private var offset: CGFloat { SnappingOffset.getOpenOffset(openLocation) + dragTranslation + dragOffset }
+    
     
     let openLocation: OpenLocation
     let content: Content
@@ -29,27 +31,38 @@ public struct BottomSheet<Content>: View where Content: View {
             .onChange(of: isOpen){ newValue in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
                     if !newValue {
-                        offset = .zero
+                        dragOffset = .zero
                     }
                 }
             }
             .frame(width: geometry.size.width,
                    height: geometry.size.height * 2,
                    alignment: .top)
-            
             .background(Color(.tertiarySystemBackground))
             .cornerRadius(20)
             .shadow(color: Color(.systemGray4), radius: 4)
-            .offset(y: isOpen ? SnappingOffset.getOpenOffset(openLocation) : UIScreen.main.bounds.height)
-            .offset(y: dragTranslation)
-            .offset(y: offset)
+            .offset(y: isOpen ? offset : UIScreen.main.bounds.height)
             .gesture(DragGesture()
                 .updating($dragTranslation){ value, gestureState, transaction in gestureState = value.translation.height }
-                .onEnded{ value in offset = SnappingOffset.calculateOffset(openLocation: openLocation, offset: offset, drarGestureValue: value) }
+                .onEnded{ value in dragOffset = SnappingOffset.calculateDragOffset(openLocation: openLocation, dragOffset: dragOffset, dragTranslation: value.translation.height) }
             )
             .animation(.spring(), value: isOpen)
             .animation(.spring(), value: dragTranslation)
-        }.edgesIgnoringSafeArea(.all)
+        }
+        .background(
+            Color(.black)
+                .opacity(isOpen ? calculateBackgroundOpacity(offset: offset, maxOpacity: 0.5) : 0)
+                .animation(.easeIn)
+        )
+        .edgesIgnoringSafeArea(.all)
+    }
+    
+    func calculateBackgroundOpacity(offset currentOffset: CGFloat, maxOpacity: CGFloat) -> CGFloat {
+        let maxOffset = SnappingOffset.middle
+        let minOffset = SnappingOffset.top
+        let delta = maxOffset - currentOffset
+        let k = delta / ((maxOffset - minOffset) / (maxOpacity * 10))
+        return 0.1 * k
     }
 }
 
@@ -57,7 +70,7 @@ struct BottomSheet_Previews: PreviewProvider {
     static var previews: some View {
         ZStack{
             Rectangle().frame(width: 100, height: 100)
-            BottomSheet(isOpen: .constant(true), openLocation: .middle){
+            BottomSheet(isOpen: .constant(true), openLocation: .top){
                 VStack{
                     Text("Test text 123")
                     Text("Hello world")
