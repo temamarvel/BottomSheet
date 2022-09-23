@@ -6,19 +6,20 @@
 
 import SwiftUI
 
-public struct BottomSheet<Content>: View where Content: View {
+public struct BottomSheet<Content, BackgroundShapeStyle>: View where Content: View, BackgroundShapeStyle: ShapeStyle {
     @GestureState private var dragTranslation = CGFloat.zero
     @Binding private var isOpen: Bool
     @State private var dragOffset = CGFloat.zero
     private var offset: CGFloat { SnappingOffset.getOpenOffset(openLocation) + dragTranslation + dragOffset }
     
-    
     let openLocation: OpenLocation
     let content: Content
+    let background: BackgroundShapeStyle
     
-    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, @ViewBuilder content: () -> Content) {
+    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, background: BackgroundShapeStyle = .black, @ViewBuilder content: () -> Content) {
         self._isOpen = isOpen
         self.openLocation = openLocation
+        self.background = background
         self.content = content()
     }
     
@@ -49,10 +50,10 @@ public struct BottomSheet<Content>: View where Content: View {
             .animation(.spring(), value: isOpen)
             .animation(.spring(), value: dragTranslation)
         }
+        
         .background(
-            Color(.black)
+            background
                 .opacity(isOpen ? calculateBackgroundOpacity(offset: offset, maxOpacity: 0.5) : 0)
-                .animation(.easeIn)
         )
         .edgesIgnoringSafeArea(.all)
     }
@@ -70,7 +71,7 @@ struct BottomSheet_Previews: PreviewProvider {
     static var previews: some View {
         ZStack{
             Rectangle().frame(width: 100, height: 100)
-            BottomSheet(isOpen: .constant(true), openLocation: .top){
+            BottomSheet(isOpen: .constant(true), openLocation: .middle, background: .secondary){
                 VStack{
                     Text("Test text 123")
                     Text("Hello world")
@@ -79,6 +80,6 @@ struct BottomSheet_Previews: PreviewProvider {
                 .frame(width: 200, height: 400)
                 .background(.red)
             }
-        }
+        }.background(.yellow)
     }
 }
