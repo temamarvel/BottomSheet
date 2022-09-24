@@ -6,7 +6,7 @@
 
 import SwiftUI
 
-public struct BottomSheet<Content, BackgroundShapeStyle>: View where Content: View, BackgroundShapeStyle: ShapeStyle {
+public struct BottomSheet<Content, BackgroundShapeStyle, SheetBackgroundShapeStyle>: View where Content: View, BackgroundShapeStyle: ShapeStyle, SheetBackgroundShapeStyle: ShapeStyle {
     @GestureState private var dragTranslation = CGFloat.zero
     @Binding private var isOpen: Bool
     @State private var dragOffset = CGFloat.zero
@@ -16,13 +16,15 @@ public struct BottomSheet<Content, BackgroundShapeStyle>: View where Content: Vi
     let content: Content
     let showBackground: Bool
     let background: BackgroundShapeStyle
+    let sheetBackground: SheetBackgroundShapeStyle
     let showCloseButton: Bool
     
-    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, showCloseButton: Bool = false, showBackground: Bool = true, background: BackgroundShapeStyle = .secondary, @ViewBuilder content: () -> Content) {
+    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, showCloseButton: Bool = false, sheetBackground: SheetBackgroundShapeStyle = Color(.tertiarySystemBackground), showBackground: Bool = true, background: BackgroundShapeStyle = .secondary, @ViewBuilder content: () -> Content) {
         self._isOpen = isOpen
         self.openLocation = openLocation
         self.showBackground = showBackground
         self.background = background
+        self.sheetBackground = sheetBackground
         self.showCloseButton = showCloseButton
         self.content = content()
     }
@@ -54,7 +56,7 @@ public struct BottomSheet<Content, BackgroundShapeStyle>: View where Content: Vi
             .frame(width: geometry.size.width,
                    height: geometry.size.height * 2,
                    alignment: .top)
-            .background(Color(.tertiarySystemBackground))
+            .background(sheetBackground)
             .cornerRadius(20)
             .shadow(color: Color(.systemGray4), radius: 4)
             .offset(y: isOpen ? offset : UIScreen.main.bounds.height)
@@ -84,7 +86,7 @@ struct BottomSheet_Previews: PreviewProvider {
     static var previews: some View {
         ZStack{
             Rectangle().frame(width: 100, height: 100)
-            BottomSheet(isOpen: .constant(true), openLocation: .middle, showCloseButton: true, showBackground: true, background: .secondary){
+            BottomSheet(isOpen: .constant(true), openLocation: .middle, showCloseButton: true, sheetBackground: .regularMaterial, showBackground: true, background: .secondary){
                 VStack{
                     Text("Test text 123")
                     Text("Hello world")
