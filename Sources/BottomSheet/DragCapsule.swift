@@ -19,7 +19,6 @@ public struct DragCapsule: View {
         Capsule()
             .fill(Color(.tertiarySystemFill))
             .frame(width: width, height: height)
-            .padding()
     }
 }
 

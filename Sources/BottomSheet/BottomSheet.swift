@@ -16,20 +16,33 @@ public struct BottomSheet<Content, BackgroundShapeStyle>: View where Content: Vi
     let content: Content
     let showBackground: Bool
     let background: BackgroundShapeStyle
+    let showCloseButton: Bool
     
-    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, showBackground: Bool = true, background: BackgroundShapeStyle = .secondary, @ViewBuilder content: () -> Content) {
+    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, showCloseButton: Bool = false, showBackground: Bool = true, background: BackgroundShapeStyle = .secondary, @ViewBuilder content: () -> Content) {
         self._isOpen = isOpen
         self.openLocation = openLocation
         self.showBackground = showBackground
         self.background = background
+        self.showCloseButton = showCloseButton
         self.content = content()
     }
     
     public var body: some View {
         GeometryReader{ geometry in
-            VStack(){
-                DragCapsule()
-                self.content
+            ZStack(alignment: .top){
+                VStack(){
+                    DragCapsule().padding()
+                    self.content
+                }
+                if(showCloseButton){
+                    Button { isOpen.toggle() } label: {
+                        Image(systemName: "x.circle.fill")
+                            .font(.title)
+                            .foregroundColor(Color.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding()
+                }
             }
             .onChange(of: isOpen){ newValue in
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
@@ -71,7 +84,7 @@ struct BottomSheet_Previews: PreviewProvider {
     static var previews: some View {
         ZStack{
             Rectangle().frame(width: 100, height: 100)
-            BottomSheet(isOpen: .constant(true), openLocation: .middle, showBackground: true, background: .secondary){
+            BottomSheet(isOpen: .constant(true), openLocation: .middle, showCloseButton: true, showBackground: true, background: .secondary){
                 VStack{
                     Text("Test text 123")
                     Text("Hello world")
