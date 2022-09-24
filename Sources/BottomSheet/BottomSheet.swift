@@ -14,11 +14,13 @@ public struct BottomSheet<Content, BackgroundShapeStyle>: View where Content: Vi
     
     let openLocation: OpenLocation
     let content: Content
+    let showBackground: Bool
     let background: BackgroundShapeStyle
     
-    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, background: BackgroundShapeStyle = .black, @ViewBuilder content: () -> Content) {
+    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, showBackground: Bool = true, background: BackgroundShapeStyle = .secondary, @ViewBuilder content: () -> Content) {
         self._isOpen = isOpen
         self.openLocation = openLocation
+        self.showBackground = showBackground
         self.background = background
         self.content = content()
     }
@@ -50,11 +52,9 @@ public struct BottomSheet<Content, BackgroundShapeStyle>: View where Content: Vi
             .animation(.spring(), value: isOpen)
             .animation(.spring(), value: dragTranslation)
         }
-        
-        .background(
-            background
-                .opacity(isOpen ? calculateBackgroundOpacity(offset: offset, maxOpacity: 0.5) : 0)
-        )
+        .if(showBackground){
+            view in view.background(background.opacity(isOpen ? calculateBackgroundOpacity(offset: offset, maxOpacity: 0.5) : 0))
+        }
         .edgesIgnoringSafeArea(.all)
     }
     
@@ -71,7 +71,7 @@ struct BottomSheet_Previews: PreviewProvider {
     static var previews: some View {
         ZStack{
             Rectangle().frame(width: 100, height: 100)
-            BottomSheet(isOpen: .constant(true), openLocation: .middle, background: .secondary){
+            BottomSheet(isOpen: .constant(true), openLocation: .middle, showBackground: true, background: .secondary){
                 VStack{
                     Text("Test text 123")
                     Text("Hello world")
