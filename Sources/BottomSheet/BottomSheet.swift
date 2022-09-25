@@ -7,10 +7,18 @@
 import SwiftUI
 
 public struct BottomSheet<Content, BackgroundShapeStyle, SheetBackgroundShapeStyle>: View where Content: View, BackgroundShapeStyle: ShapeStyle, SheetBackgroundShapeStyle: ShapeStyle {
+    
+    @ObservedObject var state = SheetState()
+    
+    
     @GestureState private var dragTranslation = CGFloat.zero
     @Binding private var isOpen: Bool
     @State private var dragOffset = CGFloat.zero
+    
     private var offset: CGFloat { SnappingOffset.getOpenOffset(openLocation) + dragTranslation + dragOffset }
+    
+    
+    @State private var custom = AnyShapeStyle(Color(.green))
     
     let openLocation: OpenLocation
     let content: Content
@@ -56,7 +64,7 @@ public struct BottomSheet<Content, BackgroundShapeStyle, SheetBackgroundShapeSty
             .frame(width: geometry.size.width,
                    height: geometry.size.height * 2,
                    alignment: .top)
-            .background(sheetBackground)
+            .background(state.color, ignoresSafeAreaEdges: .all)
             .cornerRadius(20)
             .shadow(color: Color(.systemGray4), radius: 4)
             .offset(y: isOpen ? offset : UIScreen.main.bounds.height)
@@ -80,6 +88,19 @@ public struct BottomSheet<Content, BackgroundShapeStyle, SheetBackgroundShapeSty
         let k = delta / ((maxOffset - minOffset) / (maxOpacity * 10))
         return 0.1 * k
     }
+    
+    func changeColor(color: any ShapeStyle){
+        custom = AnyShapeStyle(color)
+    }
+    
+    func test(color: any ShapeStyle) -> BottomSheet{
+        self.state.color = AnyShapeStyle(color)
+        return self
+    }
+}
+
+class SheetState: ObservableObject{
+    @Published var color = AnyShapeStyle(Color(.orange))
 }
 
 struct BottomSheet_Previews: PreviewProvider {
@@ -95,6 +116,7 @@ struct BottomSheet_Previews: PreviewProvider {
                 .frame(width: 200, height: 400)
                 .background(.red)
             }
+            .test(color: .green)
         }.background(.yellow)
     }
 }
