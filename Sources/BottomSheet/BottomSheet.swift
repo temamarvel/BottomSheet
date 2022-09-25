@@ -6,10 +6,8 @@
 
 import SwiftUI
 
-public struct BottomSheet<Content, BackgroundShapeStyle, SheetBackgroundShapeStyle>: View where Content: View, BackgroundShapeStyle: ShapeStyle, SheetBackgroundShapeStyle: ShapeStyle {
-    
+public struct BottomSheet<Content>: View where Content: View {
     @ObservedObject var state = SheetState()
-    
     
     @GestureState private var dragTranslation = CGFloat.zero
     @Binding private var isOpen: Bool
@@ -17,23 +15,16 @@ public struct BottomSheet<Content, BackgroundShapeStyle, SheetBackgroundShapeSty
     
     private var offset: CGFloat { SnappingOffset.getOpenOffset(openLocation) + dragTranslation + dragOffset }
     
-    
-    @State private var custom = AnyShapeStyle(Color(.green))
-    
     let openLocation: OpenLocation
     let content: Content
     let showBackground: Bool
-    let background: BackgroundShapeStyle
-    let sheetBackground: SheetBackgroundShapeStyle
     let showCloseButton: Bool
     
-    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, showCloseButton: Bool = false, sheetBackground: SheetBackgroundShapeStyle = Color(.tertiarySystemBackground), showBackground: Bool = true, background: BackgroundShapeStyle = .secondary, @ViewBuilder content: () -> Content) {
+    public init(isOpen: Binding<Bool>, openLocation: OpenLocation = .middle, showCloseButton: Bool = false, showBackground: Bool = true, @ViewBuilder content: () -> Content) {
         self._isOpen = isOpen
         self.openLocation = openLocation
-        self.showBackground = showBackground
-        self.background = background
-        self.sheetBackground = sheetBackground
         self.showCloseButton = showCloseButton
+        self.showBackground = showBackground
         self.content = content()
     }
     
@@ -64,7 +55,7 @@ public struct BottomSheet<Content, BackgroundShapeStyle, SheetBackgroundShapeSty
             .frame(width: geometry.size.width,
                    height: geometry.size.height * 2,
                    alignment: .top)
-            .background(state.color, ignoresSafeAreaEdges: .all)
+            .background(state.sheetBackground)
             .cornerRadius(20)
             .shadow(color: Color(.systemGray4), radius: 4)
             .offset(y: isOpen ? offset : UIScreen.main.bounds.height)
@@ -76,7 +67,7 @@ public struct BottomSheet<Content, BackgroundShapeStyle, SheetBackgroundShapeSty
             .animation(.spring(), value: dragTranslation)
         }
         .if(showBackground){
-            view in view.background(background.opacity(isOpen ? calculateBackgroundOpacity(offset: offset, maxOpacity: 0.5) : 0))
+            view in view.background(state.background.opacity(isOpen ? calculateBackgroundOpacity(offset: offset, maxOpacity: 0.5) : 0))
         }
         .edgesIgnoringSafeArea(.all)
     }
@@ -89,25 +80,22 @@ public struct BottomSheet<Content, BackgroundShapeStyle, SheetBackgroundShapeSty
         return 0.1 * k
     }
     
-    func changeColor(color: any ShapeStyle){
-        custom = AnyShapeStyle(color)
-    }
-    
-    func test(color: any ShapeStyle) -> BottomSheet{
-        self.state.color = AnyShapeStyle(color)
+    func sheetBackground(_ sheetBackground: any ShapeStyle) -> BottomSheet{
+        self.state.sheetBackground = AnyShapeStyle(sheetBackground)
         return self
     }
-}
-
-class SheetState: ObservableObject{
-    @Published var color = AnyShapeStyle(Color(.orange))
+    
+    func background(_ background: any ShapeStyle) -> BottomSheet{
+        self.state.background = AnyShapeStyle(background)
+        return self
+    }
 }
 
 struct BottomSheet_Previews: PreviewProvider {
     static var previews: some View {
         ZStack{
             Rectangle().frame(width: 100, height: 100)
-            BottomSheet(isOpen: .constant(true), openLocation: .middle, showCloseButton: true, sheetBackground: .regularMaterial, showBackground: true, background: .secondary){
+            BottomSheet(isOpen: .constant(true), openLocation: .middle, showCloseButton: true){
                 VStack{
                     Text("Test text 123")
                     Text("Hello world")
@@ -116,7 +104,8 @@ struct BottomSheet_Previews: PreviewProvider {
                 .frame(width: 200, height: 400)
                 .background(.red)
             }
-            .test(color: .green)
+            .sheetBackground(.green)
+            .background(.red)
         }.background(.yellow)
     }
 }
