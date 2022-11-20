@@ -4,3 +4,5 @@
 
 # BottomSheet
 SwiftUI component implements BottomSheet menu functionality
+
+Available as SPM package
